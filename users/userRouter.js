@@ -1,47 +1,60 @@
 const express = require('express');
+const users = require('./userDb');
+const { validateUserId, validateUser } = require('../middleware/user');
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
-  // do your magic!
+// Create user
+router.post('/', validateUser, (req, res, next) => {
+  users
+    .insert(req.body)
+    .then(user => res.status(201).json(user))
+    .catch(next);
 });
 
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
+// Add post for user
+router.post('/:id/posts', validateUserId, (req, res) => {});
+
+// Get all users
+router.get('/', (req, res, next) => {
+  users
+    .get()
+    .then(users => res.status(200).json(users))
+    .catch(next);
 });
 
-router.get('/', (req, res) => {
-  // do your magic!
+// Get single user
+router.get('/:id', validateUserId, (req, res) => {
+  res.status(200).json(req.user);
 });
 
-router.get('/:id', (req, res) => {
-  // do your magic!
+// Get posts for user
+router.get('/:id/posts', validateUserId, (req, res) => {});
+
+// Delete user
+router.delete('/:id', validateUserId, (req, res, next) => {
+  users
+    .remove(req.params.id)
+    .then(count => {
+      if (count > 0) {
+        res.status(200).json({
+          msg: 'The user has been deleted'
+        });
+      } else {
+        res.status(404).json({
+          msg: 'The user could not be found'
+        });
+      }
+    })
+    .catch(next);
 });
 
-router.get('/:id/posts', (req, res) => {
-  // do your magic!
+// Update user
+router.put('/:id', validateUser, validateUserId, (req, res, next) => {
+  users
+    .update(req.params.id, req.body)
+    .then(user => res.status(200).json(user))
+    .catch(next);
 });
-
-router.delete('/:id', (req, res) => {
-  // do your magic!
-});
-
-router.put('/:id', (req, res) => {
-  // do your magic!
-});
-
-//custom middleware
-
-function validateUserId(req, res, next) {
-  // do your magic!
-}
-
-function validateUser(req, res, next) {
-  // do your magic!
-}
-
-function validatePost(req, res, next) {
-  // do your magic!
-}
 
 module.exports = router;
