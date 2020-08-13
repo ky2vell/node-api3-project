@@ -1,6 +1,11 @@
 const express = require('express');
 const users = require('./userDb');
-const { validateUserId, validateUser } = require('../middleware/user');
+const posts = require('../posts/postDb');
+const {
+  validateUserId,
+  validateUser,
+  validatePost
+} = require('../middleware/user');
 
 const router = express.Router();
 
@@ -14,9 +19,6 @@ router.post('/', validateUser(), async (req, res, next) => {
   }
 });
 
-// Add post for user
-router.post('/:id/posts', validateUserId(), (req, res) => {});
-
 // Get all users
 router.get('/', async (req, res, next) => {
   try {
@@ -28,12 +30,13 @@ router.get('/', async (req, res, next) => {
 });
 
 // Get single user
-router.get('/:id', validateUserId(), (req, res) => {
-  res.status(200).json(req.user);
+router.get('/:id', validateUserId(), (req, res, next) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (err) {
+    next(err);
+  }
 });
-
-// Get posts for user
-router.get('/:id/posts', validateUserId(), (req, res) => {});
 
 // Delete user
 router.delete('/:id', validateUserId(), async (req, res, next) => {
@@ -62,5 +65,33 @@ router.put('/:id', validateUser(), validateUserId(), async (req, res, next) => {
     next(err);
   }
 });
+
+// Get posts for user
+router.get('/:id/posts', validateUserId(), async (req, res, next) => {
+  try {
+    const posts = await users.getUserPosts(req.user.id);
+    res.status(200).json(posts);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Add new post for user
+router.post(
+  '/:id/posts',
+  validatePost(),
+  validateUserId(),
+  async (req, res, next) => {
+    try {
+      const newPost = await posts.insert({
+        user_id: req.user.id,
+        text: req.body.text
+      });
+      res.status(201).json(newPost);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 module.exports = router;

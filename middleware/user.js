@@ -19,7 +19,7 @@ function validateUserId() {
 
 function validateUser() {
   return (req, res, next) => {
-    if (!req.body) {
+    if (Object.keys(req.body).length === 0) {
       return res.status(400).json({ msg: 'Missing user data' });
     } else if (!req.body.name) {
       return res.status(400).json({ msg: 'Missing required name field' });
@@ -29,4 +29,14 @@ function validateUser() {
   };
 }
 
-module.exports = { validateUserId, validateUser };
+function validatePost() {
+  return (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({ msg: 'Missing required text field' });
+    }
+
+    next();
+  };
+}
+
+module.exports = { validateUserId, validateUser, validatePost };
