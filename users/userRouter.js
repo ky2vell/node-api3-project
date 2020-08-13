@@ -5,56 +5,62 @@ const { validateUserId, validateUser } = require('../middleware/user');
 const router = express.Router();
 
 // Create user
-router.post('/', validateUser, (req, res, next) => {
-  users
-    .insert(req.body)
-    .then(user => res.status(201).json(user))
-    .catch(next);
+router.post('/', validateUser(), async (req, res, next) => {
+  try {
+    const user = await users.insert(req.body);
+    res.status(201).json(user);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Add post for user
-router.post('/:id/posts', validateUserId, (req, res) => {});
+router.post('/:id/posts', validateUserId(), (req, res) => {});
 
 // Get all users
-router.get('/', (req, res, next) => {
-  users
-    .get()
-    .then(users => res.status(200).json(users))
-    .catch(next);
+router.get('/', async (req, res, next) => {
+  try {
+    const userList = await users.get();
+    res.status(200).json(userList);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Get single user
-router.get('/:id', validateUserId, (req, res) => {
+router.get('/:id', validateUserId(), (req, res) => {
   res.status(200).json(req.user);
 });
 
 // Get posts for user
-router.get('/:id/posts', validateUserId, (req, res) => {});
+router.get('/:id/posts', validateUserId(), (req, res) => {});
 
 // Delete user
-router.delete('/:id', validateUserId, (req, res, next) => {
-  users
-    .remove(req.params.id)
-    .then(count => {
-      if (count > 0) {
-        res.status(200).json({
-          msg: 'The user has been deleted'
-        });
-      } else {
-        res.status(404).json({
-          msg: 'The user could not be found'
-        });
-      }
-    })
-    .catch(next);
+router.delete('/:id', validateUserId(), async (req, res, next) => {
+  try {
+    const count = await users.remove(req.params.id);
+    if (count > 0) {
+      res.status(200).json({
+        msg: 'The user has been deleted'
+      });
+    } else {
+      res.status(404).json({
+        msg: 'The user could not be found'
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Update user
-router.put('/:id', validateUser, validateUserId, (req, res, next) => {
-  users
-    .update(req.params.id, req.body)
-    .then(user => res.status(200).json(user))
-    .catch(next);
+router.put('/:id', validateUser(), validateUserId(), async (req, res, next) => {
+  try {
+    const user = await users.update(req.params.id, req.body);
+    res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
