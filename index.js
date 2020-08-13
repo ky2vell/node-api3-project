@@ -1,5 +1,6 @@
 const express = require('express');
 const userRouter = require('./users/userRouter');
+const postRouter = require('./posts/postRouter');
 const logger = require('./middleware/logger');
 const error = require('./middleware/error');
 
@@ -11,6 +12,7 @@ app.use(logger);
 
 // API Routes
 app.use('/api/users', userRouter);
+app.use('/api/posts', postRouter);
 
 // Error MiddleWare
 app.use(error);
