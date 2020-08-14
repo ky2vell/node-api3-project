@@ -62,3 +62,6 @@ typings/
 
 # Mac files
 .DS_Store
+
+# Environment Variables
+config/config.env
