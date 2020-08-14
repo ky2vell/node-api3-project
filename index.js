@@ -1,4 +1,7 @@
+require('dotenv').config();
+
 const express = require('express');
+const welcomeRouter = require('./welcome/welcomeRouter');
 const userRouter = require('./users/userRouter');
 const postRouter = require('./posts/postRouter');
 const logger = require('./middleware/logger');
@@ -11,12 +14,13 @@ app.use(express.json());
 app.use(logger);
 
 // API Routes
+app.use('/', welcomeRouter);
 app.use('/api/users', userRouter);
 app.use('/api/posts', postRouter);
 
 // Error MiddleWare
 app.use(error);
 
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT;
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(port, () => console.log(`Server running on port ${port}`));
